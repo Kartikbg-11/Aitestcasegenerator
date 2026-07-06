@@ -7,7 +7,14 @@ const globalForPrisma = globalThis as unknown as {
 export const db =
   globalForPrisma.prisma ??
   new PrismaClient({
+<<<<<<< HEAD
     log: process.env.NODE_ENV !== 'production' ? ['query'] : [],
   })
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db
+=======
+    log: ['query'],
+  })
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db
+>>>>>>> origin/master

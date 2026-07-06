@@ -17,7 +17,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import {
   LayoutDashboard, FolderOpen, FileText, Sparkles, TestTube2, GitBranch,
   BarChart3, Users, Settings, Brain, Sun, Moon, Bell, Menu, LogOut,
+<<<<<<< HEAD
   UserCircle, KeyRound, X, PanelLeftClose, PanelLeft, Bug,
+=======
+  UserCircle, KeyRound, X, PanelLeftClose, PanelLeft,
+>>>>>>> origin/master
 } from 'lucide-react';
 
 import LoginPage from '@/app/page-components/LoginPage';
@@ -30,7 +34,10 @@ import RtmPage from '@/app/page-components/RtmPage';
 import ReportsPage from '@/app/page-components/ReportsPage';
 import UsersPage from '@/app/page-components/UsersPage';
 import SettingsPage from '@/app/page-components/SettingsPage';
+<<<<<<< HEAD
 import DefectsPage from '@/app/page-components/DefectsPage';
+=======
+>>>>>>> origin/master
 
 /* ──────────── Types ──────────── */
 interface AppContextType {
@@ -48,7 +55,10 @@ const navItems = [
   { id: 'generator', label: 'AI Generator', icon: Sparkles },
   { id: 'testcases', label: 'Test Cases', icon: TestTube2 },
   { id: 'rtm', label: 'RTM', icon: GitBranch },
+<<<<<<< HEAD
   { id: 'defects', label: 'Defects', icon: Bug },
+=======
+>>>>>>> origin/master
   { id: 'reports', label: 'Reports', icon: BarChart3 },
   { id: 'users', label: 'Users', icon: Users },
   { id: 'settings', label: 'Settings', icon: Settings },
@@ -196,6 +206,7 @@ function AppShell() {
   const pageTitle = navItems.find(n => n.id === currentPage)?.label || 'Dashboard';
 
   const renderPage = () => {
+<<<<<<< HEAD
     switch (currentPage) {
       case 'dashboard': return <DashboardPage onNavigate={navigate} />;
       case 'projects': return <ProjectsPage />;
@@ -208,6 +219,21 @@ function AppShell() {
       case 'users': return <UsersPage />;
       case 'settings': return <SettingsPage />;
       default: return <DashboardPage onNavigate={navigate} />;
+=======
+    // Use key to force remount on page change, preventing stale state/routing bugs
+    const key = currentPage;
+    switch (currentPage) {
+      case 'dashboard': return <DashboardPage key={key} onNavigate={navigate} />;
+      case 'projects': return <ProjectsPage key={key} />;
+      case 'documents': return <DocumentsPage key={key} />;
+      case 'generator': return <AiGeneratorPage key={key} />;
+      case 'testcases': return <TestCasesPage key={key} />;
+      case 'rtm': return <RtmPage key={key} />;
+      case 'reports': return <ReportsPage key={key} />;
+      case 'users': return <UsersPage key={key} />;
+      case 'settings': return <SettingsPage key={key} />;
+      default: return <DashboardPage key={key} onNavigate={navigate} />;
+>>>>>>> origin/master
     }
   };
 

@@ -21,10 +21,13 @@ model User {
   createdProjects Project[]      @relation("ProjectCreator")
   projects        ProjectMember[]
   testCases       TestCase[]
+<<<<<<< HEAD
   reportedDefects Defect[]       @relation("DefectReporter")
   assignedDefects Defect[]       @relation("DefectAssignee")
   defectComments  DefectComment[]
   defectHistory   DefectHistory[]
+=======
+>>>>>>> origin/master
   auditLogs       AuditLog[]
 }
 
@@ -43,7 +46,10 @@ model Project {
   testCases       TestCase[]
   rtms            RTM[]
   bugPredictions  BugPrediction[]
+<<<<<<< HEAD
   defects         Defect[]
+=======
+>>>>>>> origin/master
 }
 
 model ProjectMember {
@@ -175,6 +181,7 @@ model AppSetting {
   value       String
   description String   @default("")
   updatedAt   DateTime @updatedAt
+<<<<<<< HEAD
 }
 
 model Defect {
@@ -229,4 +236,6 @@ model DefectHistory {
   newValue    String   @default("")
   details     String   @default("")
   createdAt   DateTime @default(now())
+=======
+>>>>>>> origin/master
 }

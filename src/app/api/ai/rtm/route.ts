@@ -13,7 +13,13 @@ export async function POST(request: NextRequest) {
     const project = await db.project.findUnique({
       where: { id: projectId },
       include: {
+<<<<<<< HEAD
         requirements: true,
+=======
+        documents: {
+          include: { requirements: true },
+        },
+>>>>>>> origin/master
         testScenarios: true,
         testCases: true,
       },
@@ -26,9 +32,18 @@ export async function POST(request: NextRequest) {
     // Generate RTM entries based on existing data
     const rtmEntries = []
 
+<<<<<<< HEAD
     // If we have requirements, create RTM entries
     if (project.requirements.length > 0) {
       for (const req of project.requirements) {
+=======
+    // Collect all requirements from all documents in the project
+    const allRequirements = project.documents.flatMap((doc) => doc.requirements)
+
+    // If we have requirements, create RTM entries
+    if (allRequirements.length > 0) {
+      for (const req of allRequirements) {
+>>>>>>> origin/master
         const linkedScenarios = project.testScenarios.filter((s) => s.requirementId === req.reqId)
         const linkedTestCases = project.testCases.filter((tc) => tc.requirementId === req.reqId)
 

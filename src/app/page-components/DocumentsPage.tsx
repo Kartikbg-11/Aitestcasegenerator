@@ -84,6 +84,11 @@ export default function DocumentsPage() {
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
   const [uploadMessage, setUploadMessage] = useState('');
   const [loading, setLoading] = useState(true);
+<<<<<<< HEAD
+=======
+  const [showProjectPicker, setShowProjectPicker] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+>>>>>>> origin/master
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch projects from the database
@@ -136,6 +141,7 @@ export default function DocumentsPage() {
     return matchProject && matchSearch;
   });
 
+<<<<<<< HEAD
   // Actual file upload handler
   const uploadFiles = useCallback(async (files: FileList | File[]) => {
     if (!files || files.length === 0) return;
@@ -149,6 +155,24 @@ export default function DocumentsPage() {
     }
 
     const selectedProject = projectFilter;
+=======
+  // Upload files to a specific project (used by project picker dialog)
+  const uploadFilesToProject = useCallback(async (files: File[], projectId: string) => {
+    if (!files || files.length === 0) return;
+    setShowProjectPicker(false);
+    setPendingFiles([]);
+    // Temporarily set the project filter so uploadFiles uses it
+    const prevFilter = projectFilter;
+    // We call the inner upload logic directly with the chosen projectId
+    await doUpload(files, projectId);
+  }, [projectFilter]);
+
+  // Actual upload logic
+  const doUpload = useCallback(async (files: FileList | File[], projectId: string) => {
+    if (!files || files.length === 0) return;
+
+    const selectedProject = projectId;
+>>>>>>> origin/master
     const uploadPromises = Array.from(files).map(async (file) => {
       // Validate file type
       const allowedExtensions = ['.pdf', '.docx', '.doc', '.txt', '.xlsx', '.csv', '.json', '.yaml', '.yml', '.png', '.jpg', '.jpeg', '.gif', '.webp'];
@@ -218,7 +242,11 @@ export default function DocumentsPage() {
       setUploadStatus('success');
       setUploadMessage(`Successfully uploaded ${successCount} file${successCount > 1 ? 's' : ''}`);
       // Reload documents after successful upload
+<<<<<<< HEAD
       await loadDocuments(projectFilter);
+=======
+      await loadDocuments(projectId);
+>>>>>>> origin/master
     }
     if (errorMessages.length > 0) {
       setUploadStatus('error');
@@ -231,11 +259,32 @@ export default function DocumentsPage() {
       setUploadProgress(null);
       setUploadMessage('');
     }, 4000);
+<<<<<<< HEAD
   }, [projectFilter, loadDocuments]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       uploadFiles(e.target.files);
+=======
+  }, [loadDocuments]);
+
+  // Wrapper that uses current projectFilter
+  const uploadFiles = useCallback(async (files: FileList | File[]) => {
+    if (!files || files.length === 0) return;
+    await doUpload(files, projectFilter);
+  }, [projectFilter, doUpload]);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const files = Array.from(e.target.files);
+      if (projectFilter === 'all') {
+        // No project selected — save files and show project picker
+        setPendingFiles(files);
+        setShowProjectPicker(true);
+      } else {
+        uploadFiles(files);
+      }
+>>>>>>> origin/master
       e.target.value = '';
     }
   };
@@ -257,7 +306,17 @@ export default function DocumentsPage() {
     e.stopPropagation();
     setIsDragging(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+<<<<<<< HEAD
       uploadFiles(e.dataTransfer.files);
+=======
+      const files = Array.from(e.dataTransfer.files);
+      if (projectFilter === 'all') {
+        setPendingFiles(files);
+        setShowProjectPicker(true);
+      } else {
+        uploadFiles(files);
+      }
+>>>>>>> origin/master
     }
   };
 
@@ -309,6 +368,7 @@ export default function DocumentsPage() {
 
       {/* Upload Area */}
       <Card className="border-zinc-800 bg-zinc-900/50">
+<<<<<<< HEAD
         <CardContent className="p-6">
           <div
             className={`border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer ${
@@ -319,10 +379,35 @@ export default function DocumentsPage() {
                 : uploadStatus === 'error'
                 ? 'border-red-500/50 bg-red-500/5'
                 : 'border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800/30'
+=======
+        <CardContent className="p-6 relative">
+          {/* Hidden file input - accessible but visually hidden */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            id="doc-file-input"
+            multiple
+            accept=".pdf,.docx,.doc,.txt,.xlsx,.csv,.json,.yaml,.yml,.png,.jpg,.jpeg,.gif,.webp"
+            onChange={handleFileSelect}
+            style={{ position: 'absolute', width: '1px', height: '1px', opacity: 0, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap' }}
+            tabIndex={-1}
+            aria-hidden="true"
+          />
+          <div
+            className={`border-2 border-dashed rounded-xl p-8 text-center transition-all ${
+              isDragging
+                ? 'border-emerald-500 bg-emerald-500/5 scale-[1.01] cursor-pointer'
+                : uploadStatus === 'success'
+                ? 'border-emerald-500/50 bg-emerald-500/5 cursor-pointer'
+                : uploadStatus === 'error'
+                ? 'border-red-500/50 bg-red-500/5 cursor-pointer'
+                : 'border-zinc-700 hover:border-emerald-500/50 hover:bg-zinc-800/30 cursor-pointer'
+>>>>>>> origin/master
             }`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
+<<<<<<< HEAD
             onClick={() => fileInputRef.current?.click()}
           >
             <input
@@ -333,6 +418,13 @@ export default function DocumentsPage() {
               onChange={handleFileSelect}
               className="hidden"
             />
+=======
+            role="button"
+            onClick={() => {
+              fileInputRef.current?.click();
+            }}
+          >
+>>>>>>> origin/master
 
             {uploadStatus === 'uploading' ? (
               <div className="space-y-4">
@@ -352,6 +444,7 @@ export default function DocumentsPage() {
               <div className="space-y-3">
                 <XCircle className="w-10 h-10 mx-auto text-red-400" />
                 <p className="text-sm font-medium text-red-400">{uploadMessage}</p>
+<<<<<<< HEAD
                 <Button
                   type="button"
                   variant="outline"
@@ -370,10 +463,37 @@ export default function DocumentsPage() {
                 <CloudUpload className={`w-10 h-10 mx-auto mb-3 transition-colors ${isDragging ? 'text-emerald-400' : 'text-zinc-500'}`} />
                 <p className="text-sm font-medium text-zinc-300">
                   {isDragging ? 'Drop files here...' : projectFilter === 'all' ? 'Select a project first, then drag & drop files here' : 'Drag & drop files here, or click to browse'}
+=======
+                <label htmlFor="doc-file-input">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="mt-2 border-zinc-600 text-zinc-300 hover:bg-zinc-700"
+                    asChild
+                  >
+                    <span>Try Again</span>
+                  </Button>
+                </label>
+              </div>
+            ) : isDragging ? (
+              <>
+                <CloudUpload className="w-10 h-10 mx-auto mb-3 text-emerald-400" />
+                <p className="text-sm font-medium text-zinc-300">Drop files here...</p>
+              </>
+            ) : (
+              <>
+                <CloudUpload className="w-10 h-10 mx-auto mb-3 text-zinc-500" />
+                <p className="text-sm font-medium text-zinc-300">
+                  {projectFilter === 'all'
+                    ? 'Click to select files — you will be prompted to choose a project'
+                    : 'Drag & drop files here, or click to browse'}
+>>>>>>> origin/master
                 </p>
                 <p className="text-xs text-zinc-500 mt-1">
                   Supports PDF, DOCX, DOC, TXT, XLSX, CSV, YAML, JSON, Images (Max 50MB)
                 </p>
+<<<<<<< HEAD
                 <Button
                   type="button"
                   variant="outline"
@@ -387,6 +507,22 @@ export default function DocumentsPage() {
                   <Upload className="w-4 h-4 mr-2" />
                   Select Files
                 </Button>
+=======
+                <label htmlFor="doc-file-input">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="mt-4 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300"
+                    asChild
+                  >
+                    <span>
+                      <Upload className="w-4 h-4 mr-2" />
+                      Select Files
+                    </span>
+                  </Button>
+                </label>
+>>>>>>> origin/master
               </>
             )}
           </div>
@@ -510,6 +646,40 @@ export default function DocumentsPage() {
         </DialogContent>
       </Dialog>
 
+<<<<<<< HEAD
+=======
+      {/* Project Picker Dialog — shown when uploading with no project selected */}
+      <Dialog open={showProjectPicker} onOpenChange={(open) => { if (!open) { setShowProjectPicker(false); setPendingFiles([]); } }}>
+        <DialogContent className="bg-zinc-900 border-zinc-700 sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-white">Select a Project</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-zinc-400">
+            {pendingFiles.length} file{pendingFiles.length > 1 ? 's' : ''} selected. Choose a project to upload to:
+          </p>
+          <div className="space-y-2 max-h-60 overflow-y-auto mt-2">
+            {projects.map(p => (
+              <button
+                key={p.id}
+                onClick={async () => {
+                  await uploadFilesToProject(pendingFiles, p.id);
+                }}
+                className="w-full text-left px-4 py-3 rounded-lg border border-zinc-700 hover:border-emerald-500/50 hover:bg-zinc-800/50 transition-all"
+              >
+                <p className="text-sm font-medium text-white">{p.name}</p>
+                {p.description && <p className="text-xs text-zinc-500 mt-0.5 truncate">{p.description}</p>}
+              </button>
+            ))}
+          </div>
+          <div className="flex justify-end mt-4">
+            <Button variant="outline" onClick={() => { setShowProjectPicker(false); setPendingFiles([]); }} className="border-zinc-600 text-zinc-300">
+              Cancel
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+>>>>>>> origin/master
       {/* Delete Confirmation */}
       <AlertDialog open={!!deleteDoc} onOpenChange={() => setDeleteDoc(null)}>
         <AlertDialogContent className="bg-zinc-900 border-zinc-700">

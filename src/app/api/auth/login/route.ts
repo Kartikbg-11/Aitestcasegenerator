@@ -10,6 +10,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Username and password are required' }, { status: 400 })
     }
 
+<<<<<<< HEAD
     // Seed admin user if not exists
     const existingAdmin = await db.user.findUnique({ where: { username: 'admin' } })
     if (!existingAdmin) {
@@ -26,6 +27,28 @@ export async function POST(request: NextRequest) {
 
       // Also seed sample data
       await seedSampleData()
+=======
+    // Seed admin user if not exists (with race-condition protection)
+    try {
+      const existingAdmin = await db.user.findUnique({ where: { username: 'admin' } })
+      if (!existingAdmin) {
+        await db.user.create({
+          data: {
+            username: 'admin',
+            email: 'admin@testcasegen.com',
+            password: 'Admin@12345',
+            firstName: 'Admin',
+            lastName: 'User',
+            role: 'ADMIN',
+          },
+        })
+        // Also seed sample data
+        await seedSampleData()
+      }
+    } catch (seedError) {
+      // Ignore unique constraint violations from concurrent requests
+      console.log('Seed check completed (may already exist):', seedError instanceof Error ? seedError.message : 'ok')
+>>>>>>> origin/master
     }
 
     const user = await db.user.findUnique({ where: { username } })

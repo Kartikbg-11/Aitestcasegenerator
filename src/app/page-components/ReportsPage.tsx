@@ -7,7 +7,12 @@ import {
 } from '@/components/ui/chart';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { mockTestCases, dashboardChartData } from '@/lib/mock-data';
+<<<<<<< HEAD
 import { Download, TestTube2, FileText, CheckCircle2, Zap, TrendingUp } from 'lucide-react';
+=======
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Download, TestTube2, FileText, CheckCircle2, Zap, TrendingUp, FileSpreadsheet, FileDown, FileBarChart } from 'lucide-react';
+>>>>>>> origin/master
 
 const priorityData = [
   { priority: 'Critical', count: mockTestCases.filter(tc => tc.priority === 'Critical').length, fill: '#ef4444' },
@@ -45,6 +50,164 @@ const autoConfig = { Automated: { label: 'Automated', color: '#10b981' }, Manual
 const sevConfig = { Critical: { label: 'Critical', color: '#ef4444' }, Major: { label: 'Major', color: '#f59e0b' }, Minor: { label: 'Minor', color: '#3b82f6' }, Trivial: { label: 'Trivial', color: '#71717a' } };
 
 export default function ReportsPage() {
+<<<<<<< HEAD
+=======
+  const exportFullCSV = () => {
+    const sections: string[] = [];
+    // Summary metrics
+    sections.push('AI TEST CASE GENERATOR PRO - FULL REPORT');
+    sections.push(`Generated: ${new Date().toLocaleString()}`);
+    sections.push('');
+    sections.push('=== SUMMARY METRICS ===');
+    sections.push('Metric,Value');
+    sections.push('Total Test Cases,342');
+    sections.push('Documents Processed,48');
+    sections.push('Requirements Covered,72%');
+    sections.push('Automation Coverage,68%');
+    sections.push('');
+    // Priority breakdown
+    sections.push('=== TEST CASES BY PRIORITY ===');
+    sections.push('Priority,Count');
+    priorityData.forEach(d => sections.push(`${d.priority},${d.count}`));
+    sections.push('');
+    // Type breakdown
+    sections.push('=== TEST CASES BY TYPE ===');
+    sections.push('Type,Count');
+    typeData.forEach(d => sections.push(`${d.name},${d.value}`));
+    sections.push('');
+    // Automation coverage
+    sections.push('=== AUTOMATION COVERAGE ===');
+    sections.push('Status,Count,Percentage');
+    const autoTotal = automationData.reduce((s, d) => s + d.value, 0);
+    automationData.forEach(d => sections.push(`${d.name},${d.value},${((d.value / autoTotal) * 100).toFixed(1)}%`));
+    sections.push('');
+    // Severity distribution
+    sections.push('=== SEVERITY DISTRIBUTION ===');
+    sections.push('Severity,Count');
+    severityData.forEach(d => sections.push(`${d.severity},${d.count}`));
+    sections.push('');
+    // All test cases detail
+    sections.push('=== ALL TEST CASES DETAIL ===');
+    const tcHeaders = ['TC ID', 'Module', 'Title', 'Priority', 'Severity', 'Type', 'Status', 'Automation'];
+    sections.push(tcHeaders.join(','));
+    mockTestCases.forEach(tc => {
+      const row = [tc.tcId, tc.module, tc.title, tc.priority, tc.severity, tc.type, tc.status, tc.automationCandidate || 'Not Set'];
+      sections.push(row.map(v => `"${(v || '').toString().replace(/"/g, '""')}"`).join(','));
+    });
+    const csv = sections.join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `full_test_report_${Date.now()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportFullJSON = () => {
+    const report = {
+      generatedAt: new Date().toISOString(),
+      title: 'AI Test Case Generator Pro - Full Report',
+      summary: {
+        totalTestCases: 342,
+        documentsProcessed: 48,
+        requirementsCovered: '72%',
+        automationCoverage: '68%',
+      },
+      priorityBreakdown: priorityData,
+      typeBreakdown: typeData,
+      automationCoverage: automationData,
+      severityDistribution: severityData,
+      monthlyTrend: dashboardChartData.monthlyTrend,
+      testCases: mockTestCases.map(tc => ({
+        tcId: tc.tcId, module: tc.module, title: tc.title,
+        priority: tc.priority, severity: tc.severity, type: tc.type,
+        status: tc.status, automationCandidate: tc.automationCandidate,
+        preconditions: tc.preconditions, expectedResult: tc.expectedResult,
+        steps: tc.steps,
+      })),
+    };
+    const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `full_test_report_${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportFullTXT = () => {
+    const lines: string[] = [];
+    const pad = (s: string, n: number) => s.padEnd(n);
+    lines.push('============================================================');
+    lines.push('        AI TEST CASE GENERATOR PRO - FULL REPORT          ');
+    lines.push('============================================================');
+    lines.push(`Generated: ${new Date().toLocaleString()}`);
+    lines.push('');
+    lines.push('------------------------------------------------------------');
+    lines.push('  SUMMARY METRICS                                            ');
+    lines.push('------------------------------------------------------------');
+    lines.push(`  Total Test Cases:        342`);
+    lines.push(`  Documents Processed:     48`);
+    lines.push(`  Requirements Covered:    72%`);
+    lines.push(`  Automation Coverage:     68%`);
+    lines.push('');
+    lines.push('------------------------------------------------------------');
+    lines.push('  TEST CASES BY PRIORITY                                   ');
+    lines.push('------------------------------------------------------------');
+    priorityData.forEach(d => {
+      lines.push(`  ${pad(d.priority, 12)} ${String(d.count).padStart(4)} test cases`);
+    });
+    lines.push('');
+    lines.push('------------------------------------------------------------');
+    lines.push('  TEST CASES BY TYPE                                        ');
+    lines.push('------------------------------------------------------------');
+    typeData.forEach(d => {
+      lines.push(`  ${pad(d.name, 20)} ${String(d.value).padStart(4)} test cases`);
+    });
+    lines.push('');
+    lines.push('------------------------------------------------------------');
+    lines.push('  AUTOMATION COVERAGE                                       ');
+    lines.push('------------------------------------------------------------');
+    const autoTotal = automationData.reduce((s, d) => s + d.value, 0);
+    automationData.forEach(d => {
+      const pct = ((d.value / autoTotal) * 100).toFixed(1);
+      lines.push(`  ${pad(d.name, 20)} ${String(d.value).padStart(4)} (${pct}%)`);
+    });
+    lines.push('');
+    lines.push('------------------------------------------------------------');
+    lines.push('  SEVERITY DISTRIBUTION                                      ');
+    lines.push('------------------------------------------------------------');
+    severityData.forEach(d => {
+      lines.push(`  ${pad(d.severity, 12)} ${String(d.count).padStart(4)} test cases`);
+    });
+    lines.push('');
+    lines.push('------------------------------------------------------------');
+    lines.push('  ALL TEST CASES DETAIL                                      ');
+    lines.push('------------------------------------------------------------');
+    mockTestCases.forEach((tc, i) => {
+      lines.push(`  [${i + 1}] ${tc.tcId} | ${tc.title}`);
+      lines.push(`      Module: ${tc.module}`);
+      lines.push(`      Priority: ${tc.priority} | Severity: ${tc.severity} | Type: ${tc.type}`);
+      lines.push(`      Status: ${tc.status} | Automation: ${tc.automationCandidate || 'Not Set'}`);
+      if (tc.preconditions) lines.push(`      Preconditions: ${tc.preconditions}`);
+      if (tc.expectedResult) lines.push(`      Expected: ${tc.expectedResult}`);
+      lines.push('');
+    });
+    lines.push('============================================================');
+    lines.push('  END OF REPORT                                              ');
+    lines.push('============================================================');
+    const txt = lines.join('\n');
+    const blob = new Blob([txt], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `full_test_report_${Date.now()}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+>>>>>>> origin/master
   return (
     <div className="space-y-6">
       {/* Stat Cards */}
@@ -184,9 +347,33 @@ export default function ReportsPage() {
 
       {/* Export */}
       <div className="flex justify-end">
+<<<<<<< HEAD
         <Button className="bg-emerald-500 hover:bg-emerald-600 text-white">
           <Download className="w-4 h-4 mr-2" />Export Full Report
         </Button>
+=======
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white">
+              <Download className="w-4 h-4 mr-2" />Export Full Report
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="bg-zinc-900 border-zinc-700">
+            <DropdownMenuItem onClick={exportFullCSV} className="text-zinc-300 focus:bg-zinc-800 focus:text-white cursor-pointer">
+              <FileSpreadsheet className="w-4 h-4 mr-2 text-emerald-400" />
+              Export as CSV (Excel Compatible)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={exportFullJSON} className="text-zinc-300 focus:bg-zinc-800 focus:text-white cursor-pointer">
+              <FileDown className="w-4 h-4 mr-2 text-blue-400" />
+              Export as JSON
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={exportFullTXT} className="text-zinc-300 focus:bg-zinc-800 focus:text-white cursor-pointer">
+              <FileBarChart className="w-4 h-4 mr-2 text-amber-400" />
+              Export as Text Report
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+>>>>>>> origin/master
       </div>
     </div>
   );

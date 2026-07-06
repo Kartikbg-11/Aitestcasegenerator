@@ -5,7 +5,11 @@
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/",
+<<<<<<< HEAD
     "start": "NODE_ENV=production bun .next/standalone/server.js",
+=======
+    "start": "NODE_ENV=production node .next/standalone/server.js",
+>>>>>>> origin/master
     "lint": "eslint .",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
@@ -53,6 +57,10 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
+<<<<<<< HEAD
+=======
+    "docx": "^9.7.1",
+>>>>>>> origin/master
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.23.2",
     "input-otp": "^1.4.2",

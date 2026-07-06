@@ -1,6 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 
+<<<<<<< HEAD
+=======
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params
+    const user = await db.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        _count: {
+          select: {
+            testCases: true,
+            projects: true,
+          },
+        },
+      },
+    })
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    return NextResponse.json(user)
+  } catch (error) {
+    console.error('Get user error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+>>>>>>> origin/master
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

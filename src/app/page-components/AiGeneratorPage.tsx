@@ -8,9 +8,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { mockProjects, mockDocuments, generationResults } from '@/lib/mock-data';
+<<<<<<< HEAD
 import {
   ChevronRight, ChevronLeft, Sparkles, FileSearch, ListChecks, TestTube2,
   AlertTriangle, Globe, Database, Bug, Bot, Download, Loader2, CheckCircle2
+=======
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+  ChevronRight, ChevronLeft, Sparkles, FileSearch, ListChecks, TestTube2,
+  AlertTriangle, Globe, Database, Bug, Bot, Download, Loader2, CheckCircle2, FileDown, FileSpreadsheet, FileText
+>>>>>>> origin/master
 } from 'lucide-react';
 
 const generationTypes = [
@@ -63,6 +70,61 @@ export default function AiGeneratorPage() {
 
   const canNext = step === 0 ? !!selectedProject : step === 1 ? !!selectedDocument : step === 2 ? !!selectedType : false;
 
+<<<<<<< HEAD
+=======
+  const exportToCSV = () => {
+    if (!results || !selectedType) return;
+    const data = results[selectedType] as Record<string, string>[];
+    if (!data || data.length === 0) return;
+    const columns = Object.keys(data[0]);
+    const header = columns.map(c => c.replace(/([A-Z])/g, ' $1').trim().toUpperCase()).join(',');
+    const rows = data.map(row => columns.map(col => {
+      const val = (row[col] || '').toString().replace(/"/g, '""');
+      return `"${val}"`;
+    }).join(','));
+    const csv = [header, ...rows].join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${selectedType}_results_${Date.now()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportToJSON = () => {
+    if (!results || !selectedType) return;
+    const data = results[selectedType] as Record<string, string>[];
+    if (!data || data.length === 0) return;
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${selectedType}_results_${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportToTXT = () => {
+    if (!results || !selectedType) return;
+    const data = results[selectedType] as Record<string, string>[];
+    if (!data || data.length === 0) return;
+    const columns = Object.keys(data[0]);
+    const colWidths = columns.map(c => Math.max(c.length, ...data.map(r => (r[c] || '').toString().length)));
+    const header = columns.map((c, i) => c.replace(/([A-Z])/g, ' $1').trim().toUpperCase().padEnd(colWidths[i] + 2)).join('|');
+    const separator = colWidths.map(w => '-'.repeat(w + 2)).join('+-');
+    const rows = data.map(row => columns.map((col, i) => (row[col] || '').toString().padEnd(colWidths[i] + 2)).join('|'));
+    const txt = `${header}\n${separator}\n${rows.join('\n')}`;
+    const blob = new Blob([txt], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${selectedType}_results_${Date.now()}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+>>>>>>> origin/master
   const renderResults = () => {
     if (!results || !selectedType) return null;
     const data = results[selectedType] as Record<string, string>[];
@@ -79,9 +141,33 @@ export default function AiGeneratorPage() {
               {data.length} items generated successfully
             </p>
           </div>
+<<<<<<< HEAD
           <Button variant="outline" size="sm" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
             <Download className="w-4 h-4 mr-2" />Export
           </Button>
+=======
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                <Download className="w-4 h-4 mr-2" />Export
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-zinc-900 border-zinc-700">
+              <DropdownMenuItem onClick={exportToCSV} className="text-zinc-300 focus:bg-zinc-800 focus:text-white cursor-pointer">
+                <FileSpreadsheet className="w-4 h-4 mr-2 text-emerald-400" />
+                Export as CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={exportToJSON} className="text-zinc-300 focus:bg-zinc-800 focus:text-white cursor-pointer">
+                <FileDown className="w-4 h-4 mr-2 text-blue-400" />
+                Export as JSON
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={exportToTXT} className="text-zinc-300 focus:bg-zinc-800 focus:text-white cursor-pointer">
+                <FileText className="w-4 h-4 mr-2 text-amber-400" />
+                Export as TXT
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+>>>>>>> origin/master
         </div>
         <div className="overflow-x-auto border border-zinc-800 rounded-lg">
           <Table>

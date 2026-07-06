@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="AI-Test-Case-Generator-Suite" verbose="1">
+
+    <listeners>
+        <listener class-name="com.testautomation.listeners.ExtentReportListener"/>
+        <listener class-name="com.testautomation.listeners.ExcelReportListener"/>
+        <!--
+            RetryTransformer auto-attaches RetryAnalyzer to every @Test in
+            the suite. Note: RetryAnalyzer itself is NEVER listed here —
+            IRetryAnalyzer is not a valid <listener> type and registering
+            it directly will fail at suite startup. Only the
+            IAnnotationTransformer (RetryTransformer) goes here.
+        -->
+        <listener class-name="com.testautomation.listeners.RetryTransformer"/>
+    </listeners>
+
+    <!--
+        parallel="false" by default for first-run safety / DOM calibration.
+        Once locators are confirmed against the live app, you can scale to:
+          parallel="methods" thread-count="3"
+        The framework's ThreadLocal<WebDriver> in BaseTest already supports
+        this without further changes.
+    -->
+    <test name="Project Creation E2E Flow" parallel="false">
+        <classes>
+            <class name="com.testautomation.tests.ProjectCreationE2ETest"/>
+        </classes>
+    </test>
+
+</suite>

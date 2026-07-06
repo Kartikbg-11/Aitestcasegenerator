@@ -84,11 +84,8 @@ export default function DocumentsPage() {
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
   const [uploadMessage, setUploadMessage] = useState('');
   const [loading, setLoading] = useState(true);
-<<<<<<< HEAD
-=======
   const [showProjectPicker, setShowProjectPicker] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
->>>>>>> origin/master
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch projects from the database
@@ -141,21 +138,6 @@ export default function DocumentsPage() {
     return matchProject && matchSearch;
   });
 
-<<<<<<< HEAD
-  // Actual file upload handler
-  const uploadFiles = useCallback(async (files: FileList | File[]) => {
-    if (!files || files.length === 0) return;
-
-    // Validate a project is selected
-    if (projectFilter === 'all') {
-      setUploadStatus('error');
-      setUploadMessage('Please select a project first before uploading documents.');
-      setTimeout(() => { setUploadStatus('idle'); setUploadMessage(''); }, 5000);
-      return;
-    }
-
-    const selectedProject = projectFilter;
-=======
   // Upload files to a specific project (used by project picker dialog)
   const uploadFilesToProject = useCallback(async (files: File[], projectId: string) => {
     if (!files || files.length === 0) return;
@@ -172,7 +154,6 @@ export default function DocumentsPage() {
     if (!files || files.length === 0) return;
 
     const selectedProject = projectId;
->>>>>>> origin/master
     const uploadPromises = Array.from(files).map(async (file) => {
       // Validate file type
       const allowedExtensions = ['.pdf', '.docx', '.doc', '.txt', '.xlsx', '.csv', '.json', '.yaml', '.yml', '.png', '.jpg', '.jpeg', '.gif', '.webp'];
@@ -242,11 +223,7 @@ export default function DocumentsPage() {
       setUploadStatus('success');
       setUploadMessage(`Successfully uploaded ${successCount} file${successCount > 1 ? 's' : ''}`);
       // Reload documents after successful upload
-<<<<<<< HEAD
-      await loadDocuments(projectFilter);
-=======
       await loadDocuments(projectId);
->>>>>>> origin/master
     }
     if (errorMessages.length > 0) {
       setUploadStatus('error');
@@ -259,13 +236,6 @@ export default function DocumentsPage() {
       setUploadProgress(null);
       setUploadMessage('');
     }, 4000);
-<<<<<<< HEAD
-  }, [projectFilter, loadDocuments]);
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      uploadFiles(e.target.files);
-=======
   }, [loadDocuments]);
 
   // Wrapper that uses current projectFilter
@@ -284,7 +254,6 @@ export default function DocumentsPage() {
       } else {
         uploadFiles(files);
       }
->>>>>>> origin/master
       e.target.value = '';
     }
   };
@@ -306,9 +275,6 @@ export default function DocumentsPage() {
     e.stopPropagation();
     setIsDragging(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-<<<<<<< HEAD
-      uploadFiles(e.dataTransfer.files);
-=======
       const files = Array.from(e.dataTransfer.files);
       if (projectFilter === 'all') {
         setPendingFiles(files);
@@ -316,7 +282,6 @@ export default function DocumentsPage() {
       } else {
         uploadFiles(files);
       }
->>>>>>> origin/master
     }
   };
 
@@ -368,18 +333,6 @@ export default function DocumentsPage() {
 
       {/* Upload Area */}
       <Card className="border-zinc-800 bg-zinc-900/50">
-<<<<<<< HEAD
-        <CardContent className="p-6">
-          <div
-            className={`border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer ${
-              isDragging
-                ? 'border-emerald-500 bg-emerald-500/5 scale-[1.01]'
-                : uploadStatus === 'success'
-                ? 'border-emerald-500/50 bg-emerald-500/5'
-                : uploadStatus === 'error'
-                ? 'border-red-500/50 bg-red-500/5'
-                : 'border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800/30'
-=======
         <CardContent className="p-6 relative">
           {/* Hidden file input - accessible but visually hidden */}
           <input
@@ -402,29 +355,15 @@ export default function DocumentsPage() {
                 : uploadStatus === 'error'
                 ? 'border-red-500/50 bg-red-500/5 cursor-pointer'
                 : 'border-zinc-700 hover:border-emerald-500/50 hover:bg-zinc-800/30 cursor-pointer'
->>>>>>> origin/master
             }`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-<<<<<<< HEAD
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple
-              accept=".pdf,.docx,.doc,.txt,.xlsx,.csv,.json,.yaml,.yml,.png,.jpg,.jpeg,.gif,.webp"
-              onChange={handleFileSelect}
-              className="hidden"
-            />
-=======
             role="button"
             onClick={() => {
               fileInputRef.current?.click();
             }}
           >
->>>>>>> origin/master
 
             {uploadStatus === 'uploading' ? (
               <div className="space-y-4">
@@ -444,26 +383,6 @@ export default function DocumentsPage() {
               <div className="space-y-3">
                 <XCircle className="w-10 h-10 mx-auto text-red-400" />
                 <p className="text-sm font-medium text-red-400">{uploadMessage}</p>
-<<<<<<< HEAD
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="mt-2 border-zinc-600 text-zinc-300 hover:bg-zinc-700"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    fileInputRef.current?.click();
-                  }}
-                >
-                  Try Again
-                </Button>
-              </div>
-            ) : (
-              <>
-                <CloudUpload className={`w-10 h-10 mx-auto mb-3 transition-colors ${isDragging ? 'text-emerald-400' : 'text-zinc-500'}`} />
-                <p className="text-sm font-medium text-zinc-300">
-                  {isDragging ? 'Drop files here...' : projectFilter === 'all' ? 'Select a project first, then drag & drop files here' : 'Drag & drop files here, or click to browse'}
-=======
                 <label htmlFor="doc-file-input">
                   <Button
                     type="button"
@@ -488,26 +407,10 @@ export default function DocumentsPage() {
                   {projectFilter === 'all'
                     ? 'Click to select files — you will be prompted to choose a project'
                     : 'Drag & drop files here, or click to browse'}
->>>>>>> origin/master
                 </p>
                 <p className="text-xs text-zinc-500 mt-1">
                   Supports PDF, DOCX, DOC, TXT, XLSX, CSV, YAML, JSON, Images (Max 50MB)
                 </p>
-<<<<<<< HEAD
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="mt-4 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    fileInputRef.current?.click();
-                  }}
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  Select Files
-                </Button>
-=======
                 <label htmlFor="doc-file-input">
                   <Button
                     type="button"
@@ -522,7 +425,6 @@ export default function DocumentsPage() {
                     </span>
                   </Button>
                 </label>
->>>>>>> origin/master
               </>
             )}
           </div>
@@ -646,8 +548,6 @@ export default function DocumentsPage() {
         </DialogContent>
       </Dialog>
 
-<<<<<<< HEAD
-=======
       {/* Project Picker Dialog — shown when uploading with no project selected */}
       <Dialog open={showProjectPicker} onOpenChange={(open) => { if (!open) { setShowProjectPicker(false); setPendingFiles([]); } }}>
         <DialogContent className="bg-zinc-900 border-zinc-700 sm:max-w-md">
@@ -679,7 +579,6 @@ export default function DocumentsPage() {
         </DialogContent>
       </Dialog>
 
->>>>>>> origin/master
       {/* Delete Confirmation */}
       <AlertDialog open={!!deleteDoc} onOpenChange={() => setDeleteDoc(null)}>
         <AlertDialogContent className="bg-zinc-900 border-zinc-700">

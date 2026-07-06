@@ -8,16 +8,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { mockProjects, mockDocuments, generationResults } from '@/lib/mock-data';
-<<<<<<< HEAD
-import {
-  ChevronRight, ChevronLeft, Sparkles, FileSearch, ListChecks, TestTube2,
-  AlertTriangle, Globe, Database, Bug, Bot, Download, Loader2, CheckCircle2
-=======
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import {
   ChevronRight, ChevronLeft, Sparkles, FileSearch, ListChecks, TestTube2,
   AlertTriangle, Globe, Database, Bug, Bot, Download, Loader2, CheckCircle2, FileDown, FileSpreadsheet, FileText
->>>>>>> origin/master
 } from 'lucide-react';
 
 const generationTypes = [
@@ -70,8 +64,6 @@ export default function AiGeneratorPage() {
 
   const canNext = step === 0 ? !!selectedProject : step === 1 ? !!selectedDocument : step === 2 ? !!selectedType : false;
 
-<<<<<<< HEAD
-=======
   const exportToCSV = () => {
     if (!results || !selectedType) return;
     const data = results[selectedType] as Record<string, string>[];
@@ -124,7 +116,6 @@ export default function AiGeneratorPage() {
     URL.revokeObjectURL(url);
   };
 
->>>>>>> origin/master
   const renderResults = () => {
     if (!results || !selectedType) return null;
     const data = results[selectedType] as Record<string, string>[];
@@ -141,11 +132,6 @@ export default function AiGeneratorPage() {
               {data.length} items generated successfully
             </p>
           </div>
-<<<<<<< HEAD
-          <Button variant="outline" size="sm" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
-            <Download className="w-4 h-4 mr-2" />Export
-          </Button>
-=======
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
@@ -167,7 +153,6 @@ export default function AiGeneratorPage() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
->>>>>>> origin/master
         </div>
         <div className="overflow-x-auto border border-zinc-800 rounded-lg">
           <Table>

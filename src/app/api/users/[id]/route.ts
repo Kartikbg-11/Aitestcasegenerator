@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 
-<<<<<<< HEAD
-=======
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -40,7 +38,6 @@ export async function GET(
   }
 }
 
->>>>>>> origin/master
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

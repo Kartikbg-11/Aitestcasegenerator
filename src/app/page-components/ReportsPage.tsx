@@ -7,12 +7,8 @@ import {
 } from '@/components/ui/chart';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { mockTestCases, dashboardChartData } from '@/lib/mock-data';
-<<<<<<< HEAD
-import { Download, TestTube2, FileText, CheckCircle2, Zap, TrendingUp } from 'lucide-react';
-=======
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Download, TestTube2, FileText, CheckCircle2, Zap, TrendingUp, FileSpreadsheet, FileDown, FileBarChart } from 'lucide-react';
->>>>>>> origin/master
 
 const priorityData = [
   { priority: 'Critical', count: mockTestCases.filter(tc => tc.priority === 'Critical').length, fill: '#ef4444' },
@@ -50,8 +46,6 @@ const autoConfig = { Automated: { label: 'Automated', color: '#10b981' }, Manual
 const sevConfig = { Critical: { label: 'Critical', color: '#ef4444' }, Major: { label: 'Major', color: '#f59e0b' }, Minor: { label: 'Minor', color: '#3b82f6' }, Trivial: { label: 'Trivial', color: '#71717a' } };
 
 export default function ReportsPage() {
-<<<<<<< HEAD
-=======
   const exportFullCSV = () => {
     const sections: string[] = [];
     // Summary metrics
@@ -207,7 +201,6 @@ export default function ReportsPage() {
     URL.revokeObjectURL(url);
   };
 
->>>>>>> origin/master
   return (
     <div className="space-y-6">
       {/* Stat Cards */}
@@ -347,11 +340,6 @@ export default function ReportsPage() {
 
       {/* Export */}
       <div className="flex justify-end">
-<<<<<<< HEAD
-        <Button className="bg-emerald-500 hover:bg-emerald-600 text-white">
-          <Download className="w-4 h-4 mr-2" />Export Full Report
-        </Button>
-=======
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button className="bg-emerald-500 hover:bg-emerald-600 text-white">
@@ -373,7 +361,6 @@ export default function ReportsPage() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
->>>>>>> origin/master
       </div>
     </div>
   );

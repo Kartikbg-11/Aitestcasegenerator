@@ -10,23 +10,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Username and password are required' }, { status: 400 })
     }
 
-    // Seed admin user if not exists
-    const existingAdmin = await db.user.findUnique({ where: { username: 'admin' } })
-    if (!existingAdmin) {
-      await db.user.create({
-        data: {
-          username: 'admin',
-          email: 'admin@testcasegen.com',
-          password: 'Admin@12345',
-          firstName: 'Admin',
-          lastName: 'User',
-          role: 'ADMIN',
-        },
-      })
-
-      // Also seed sample data
-      await seedSampleData()
-    }
+    // Seed default users if they don't exist
+    await seedDefaultUsers()
 
     const user = await db.user.findUnique({ where: { username } })
 
@@ -66,33 +51,65 @@ export async function POST(request: NextRequest) {
   }
 }
 
+async function seedDefaultUsers() {
+  // Create admin if not exists
+  const existingAdmin = await db.user.findUnique({ where: { username: 'admin' } })
+  if (!existingAdmin) {
+    await db.user.create({
+      data: {
+        username: 'admin',
+        email: 'admin@testcasegen.com',
+        password: 'Admin@12345',
+        firstName: 'Admin',
+        lastName: 'User',
+        role: 'ADMIN',
+      },
+    })
+  }
+
+  // Create qa_lead if not exists
+  const existingQaLead = await db.user.findUnique({ where: { username: 'qa_lead' } })
+  if (!existingQaLead) {
+    await db.user.create({
+      data: {
+        username: 'qa_lead',
+        email: 'qa.lead@testcasegen.com',
+        password: 'Password@123',
+        firstName: 'Sarah',
+        lastName: 'Chen',
+        role: 'QA_LEAD',
+      },
+    })
+  }
+
+  // Create qa_engineer if not exists
+  const existingQaEng = await db.user.findUnique({ where: { username: 'qa_engineer' } })
+  if (!existingQaEng) {
+    await db.user.create({
+      data: {
+        username: 'qa_engineer',
+        email: 'qa.engineer@testcasegen.com',
+        password: 'Password@123',
+        firstName: 'Mike',
+        lastName: 'Johnson',
+        role: 'QA_ENGINEER',
+      },
+    })
+  }
+
+  // Seed sample data only if no projects exist yet
+  const projectCount = await db.project.count()
+  if (projectCount === 0) {
+    await seedSampleData()
+  }
+}
+
 async function seedSampleData() {
-  // Get admin user
+  // Get admin and qa_lead users
   const admin = await db.user.findUnique({ where: { username: 'admin' } })
-  if (!admin) return
-
-  // Create sample users
-  const user1 = await db.user.create({
-    data: {
-      username: 'qa_lead',
-      email: 'qa.lead@testcasegen.com',
-      password: 'Password@123',
-      firstName: 'Sarah',
-      lastName: 'Chen',
-      role: 'QA_LEAD',
-    },
-  })
-
-  const user2 = await db.user.create({
-    data: {
-      username: 'qa_engineer',
-      email: 'qa.engineer@testcasegen.com',
-      password: 'Password@123',
-      firstName: 'Mike',
-      lastName: 'Johnson',
-      role: 'QA_ENGINEER',
-    },
-  })
+  const user1 = await db.user.findUnique({ where: { username: 'qa_lead' } })
+  const user2 = await db.user.findUnique({ where: { username: 'qa_engineer' } })
+  if (!admin || !user1 || !user2) return
 
   // Create sample projects
   const project1 = await db.project.create({

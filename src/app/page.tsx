@@ -18,6 +18,7 @@ import {
   LayoutDashboard, FolderOpen, FileText, Sparkles, TestTube2, GitBranch,
   BarChart3, Users, Settings, Brain, Sun, Moon, Bell, Menu, LogOut,
   UserCircle, KeyRound, X, PanelLeftClose, PanelLeft, Bug,
+  ClipboardList, ListTodo, KanbanSquare, CalendarDays, Activity, PlusCircle, ChevronDown, ChevronRight, Timer, FileBarChart,
 } from 'lucide-react';
 
 import LoginPage from '@/app/page-components/LoginPage';
@@ -31,6 +32,15 @@ import ReportsPage from '@/app/page-components/ReportsPage';
 import UsersPage from '@/app/page-components/UsersPage';
 import SettingsPage from '@/app/page-components/SettingsPage';
 import DefectsPage from '@/app/page-components/DefectsPage';
+import TaskDashboardPage from '@/app/page-components/TaskDashboardPage';
+import MyTasksPage from '@/app/page-components/MyTasksPage';
+import TeamTasksPage from '@/app/page-components/TeamTasksPage';
+import CreateTaskPage from '@/app/page-components/CreateTaskPage';
+import TaskDetailPage from '@/app/page-components/TaskDetailPage';
+import SprintTasksPage from '@/app/page-components/SprintTasksPage';
+import TaskCalendarPage from '@/app/page-components/TaskCalendarPage';
+import TaskReportsPage from '@/app/page-components/TaskReportsPage';
+import TaskActivityPage from '@/app/page-components/TaskActivityPage';
 
 /* ──────────── Types ──────────── */
 interface AppContextType {
@@ -49,19 +59,35 @@ const navItems = [
   { id: 'testcases', label: 'Test Cases', icon: TestTube2 },
   { id: 'rtm', label: 'RTM', icon: GitBranch },
   { id: 'defects', label: 'Defects', icon: Bug },
+  { id: 'daily-tasks', label: 'Daily Tasks', icon: ClipboardList },
+  { id: 'task-dashboard', label: 'Task Dashboard', icon: LayoutDashboard, parent: 'daily-tasks' },
+  { id: 'my-tasks', label: 'My Tasks', icon: ListTodo, parent: 'daily-tasks' },
+  { id: 'team-tasks', label: 'Team Tasks', icon: Users, parent: 'daily-tasks' },
+  { id: 'create-task', label: 'Create Task', icon: PlusCircle, parent: 'daily-tasks' },
+  { id: 'sprint-tasks', label: 'Sprint Board', icon: KanbanSquare, parent: 'daily-tasks' },
+  { id: 'task-calendar', label: 'Calendar', icon: CalendarDays, parent: 'daily-tasks' },
+  { id: 'task-reports', label: 'Task Reports', icon: FileBarChart, parent: 'daily-tasks' },
+  { id: 'task-activity', label: 'Activity Log', icon: Activity, parent: 'daily-tasks' },
   { id: 'reports', label: 'Reports', icon: BarChart3 },
   { id: 'users', label: 'Users', icon: Users },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
+const topNavItems = navItems.filter(n => !n.parent);
+const dailyTaskSubItems = navItems.filter(n => n.parent === 'daily-tasks');
+
 /* ──────────── Sidebar Content (shared between desktop & mobile) ──────────── */
 function SidebarNav({
-  currentPage, navigate, collapsed,
+  currentPage, navigate, collapsed, currentUser,
 }: {
   currentPage: string;
   navigate: (p: string) => void;
   collapsed: boolean;
+  currentUser: { id: string; username: string; email: string; firstName: string; lastName: string; role: string } | null;
 }) {
+  const [taskMenuOpen, setTaskMenuOpen] = useState(false);
+  const isDailyTaskPage = dailyTaskSubItems.some(i => i.id === currentPage);
+
   return (
     <div className="flex flex-col h-full">
       {/* Brand */}
@@ -82,7 +108,63 @@ function SidebarNav({
       {/* Nav Items */}
       <ScrollArea className="flex-1 px-3 py-3">
         <nav className="space-y-1">
-          {navItems.map(item => {
+          {topNavItems.map(item => {
+            if (item.id === 'daily-tasks') {
+              // Daily Task Management group with submenu
+              return (
+                <div key="daily-tasks-group">
+                  <TooltipProvider delayDuration={0}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={() => !collapsed && setTaskMenuOpen(!taskMenuOpen)}
+                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                            isDailyTaskPage
+                              ? 'text-emerald-400 border border-emerald-500/20 bg-emerald-500/5'
+                              : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60 border border-transparent'
+                          } ${collapsed ? 'justify-center' : ''}`}
+                        >
+                          <ClipboardList className={`w-5 h-5 shrink-0 ${isDailyTaskPage ? 'text-emerald-400' : ''}`} />
+                          {!collapsed && (
+                            <>
+                              <span className="flex-1 text-left">Daily Tasks</span>
+                              {taskMenuOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                            </>
+                          )}
+                        </button>
+                      </TooltipTrigger>
+                      {collapsed && (
+                        <TooltipContent side="right" className="bg-zinc-900 border-zinc-700 text-white text-xs">
+                          Daily Task Management
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  </TooltipProvider>
+                  {!collapsed && taskMenuOpen && (
+                    <div className="ml-4 mt-1 space-y-0.5 border-l border-zinc-800 pl-3">
+                      {dailyTaskSubItems.map(sub => {
+                        const subActive = currentPage === sub.id;
+                        return (
+                          <button
+                            key={sub.id}
+                            onClick={() => navigate(sub.id)}
+                            className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] font-medium transition-all ${
+                              subActive
+                                ? 'bg-emerald-500/10 text-emerald-400'
+                                : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/40'
+                            }`}
+                          >
+                            <sub.icon className="w-4 h-4 shrink-0" />
+                            <span>{sub.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
             const isActive = currentPage === item.id;
             return (
               <TooltipProvider key={item.id} delayDuration={0}>
@@ -113,15 +195,17 @@ function SidebarNav({
       </ScrollArea>
 
       {/* Footer */}
-      {!collapsed && (
+      {!collapsed && currentUser && (
         <div className="p-4 border-t border-zinc-800/50">
           <div className="flex items-center gap-3 px-2">
             <Avatar className="w-8 h-8">
-              <AvatarFallback className="bg-emerald-500/15 text-emerald-400 text-xs font-bold">JS</AvatarFallback>
+              <AvatarFallback className="bg-emerald-500/15 text-emerald-400 text-xs font-bold">
+                {currentUser.firstName[0]}{currentUser.lastName[0]}
+              </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">John Smith</p>
-              <p className="text-xs text-zinc-500 truncate">Admin</p>
+              <p className="text-sm font-medium text-white truncate">{currentUser.firstName} {currentUser.lastName}</p>
+              <p className="text-xs text-zinc-500 truncate">{currentUser.role}</p>
             </div>
           </div>
         </div>
@@ -138,6 +222,7 @@ function AppShell() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notificationCount] = useState(3);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
   const navigate = useCallback((page: string) => {
     setCurrentPage(page);
@@ -189,13 +274,27 @@ function AppShell() {
     setTheme('dark');
   }, [setTheme]);
 
+  const handleViewTask = useCallback((taskId: string) => {
+    setSelectedTaskId(taskId);
+    setCurrentPage('task-detail');
+  }, []);
+
+  const handleCreateTask = useCallback(() => {
+    setSelectedTaskId(null);
+    setCurrentPage('create-task');
+  }, []);
+
   if (!isAuthenticated) {
     return <LoginPage onLogin={handleLogin} />;
   }
 
-  const pageTitle = navItems.find(n => n.id === currentPage)?.label || 'Dashboard';
+  const pageTitle = [...topNavItems, ...dailyTaskSubItems].find(n => n.id === currentPage)?.label ||
+    (selectedTaskId ? 'Task Detail' : 'Dashboard');
 
   const renderPage = () => {
+    if (selectedTaskId && currentPage === 'task-detail' && currentUser) {
+      return <TaskDetailPage taskId={selectedTaskId} currentUser={currentUser} onBack={() => { setSelectedTaskId(null); setCurrentPage('my-tasks'); }} />;
+    }
     switch (currentPage) {
       case 'dashboard': return <DashboardPage onNavigate={navigate} />;
       case 'projects': return <ProjectsPage />;
@@ -204,6 +303,15 @@ function AppShell() {
       case 'testcases': return <TestCasesPage />;
       case 'rtm': return <RtmPage />;
       case 'defects': return <DefectsPage />;
+      case 'task-dashboard': return currentUser ? <TaskDashboardPage currentUser={currentUser} /> : null;
+      case 'my-tasks': return currentUser ? <MyTasksPage currentUser={currentUser} onCreateTask={handleCreateTask} onViewTask={handleViewTask} /> : null;
+      case 'team-tasks': return currentUser ? <TeamTasksPage currentUser={currentUser} /> : null;
+      case 'create-task': return currentUser ? <CreateTaskPage currentUser={currentUser} editTaskId={undefined} onTaskCreated={(id) => handleViewTask(id)} onBack={() => setCurrentPage('my-tasks')} /> : null;
+      case 'edit-task': return currentUser && selectedTaskId ? <CreateTaskPage currentUser={currentUser} editTaskId={selectedTaskId} onTaskCreated={(id) => handleViewTask(id)} onBack={() => { setSelectedTaskId(null); setCurrentPage('my-tasks'); }} /> : null;
+      case 'sprint-tasks': return currentUser ? <SprintTasksPage currentUser={currentUser} /> : null;
+      case 'task-calendar': return currentUser ? <TaskCalendarPage currentUser={currentUser} onViewTask={handleViewTask} /> : null;
+      case 'task-reports': return currentUser ? <TaskReportsPage currentUser={currentUser} /> : null;
+      case 'task-activity': return currentUser ? <TaskActivityPage currentUser={currentUser} /> : null;
       case 'reports': return <ReportsPage />;
       case 'users': return <UsersPage />;
       case 'settings': return <SettingsPage />;
@@ -220,7 +328,7 @@ function AppShell() {
             sidebarCollapsed ? 'w-[68px]' : 'w-64'
           }`}
         >
-          <SidebarNav currentPage={currentPage} navigate={navigate} collapsed={sidebarCollapsed} />
+          <SidebarNav currentPage={currentPage} navigate={navigate} collapsed={sidebarCollapsed} currentUser={currentUser} />
         </aside>
 
         {/* Mobile Sidebar */}
@@ -229,7 +337,7 @@ function AppShell() {
             <SheetHeader className="sr-only">
               <SheetTitle>Navigation</SheetTitle>
             </SheetHeader>
-            <SidebarNav currentPage={currentPage} navigate={navigate} collapsed={false} />
+            <SidebarNav currentPage={currentPage} navigate={navigate} collapsed={false} currentUser={currentUser} />
           </SheetContent>
         </Sheet>
 

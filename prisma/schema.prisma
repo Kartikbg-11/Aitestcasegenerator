@@ -8,24 +8,31 @@ datasource db {
 }
 
 model User {
-  id              String         @id @default(cuid())
-  username        String         @unique
-  email           String         @unique
-  password        String
-  firstName       String         @default("")
-  lastName        String         @default("")
-  role            String         @default("QA_ENGINEER")
-  isActive        Boolean        @default(true)
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  createdProjects Project[]      @relation("ProjectCreator")
-  projects        ProjectMember[]
-  testCases       TestCase[]
-  reportedDefects Defect[]       @relation("DefectReporter")
-  assignedDefects Defect[]       @relation("DefectAssignee")
-  defectComments  DefectComment[]
-  defectHistory   DefectHistory[]
-  auditLogs       AuditLog[]
+  id                 String              @id @default(cuid())
+  username           String              @unique
+  email              String              @unique
+  password           String
+  firstName          String              @default("")
+  lastName           String              @default("")
+  role               String              @default("QA_ENGINEER")
+  isActive           Boolean             @default(true)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  createdProjects    Project[]           @relation("ProjectCreator")
+  projects           ProjectMember[]
+  testCases          TestCase[]
+  reportedDefects    Defect[]            @relation("DefectReporter")
+  assignedDefects    Defect[]            @relation("DefectAssignee")
+  defectComments     DefectComment[]
+  defectHistory      DefectHistory[]
+  auditLogs          AuditLog[]
+  assignedTasks      DailyTask[]         @relation("TaskAssignee")
+  createdTasks       DailyTask[]         @relation("TaskAssigner")
+  taskComments       TaskComment[]       @relation("TaskCommenter")
+  taskAttachments    TaskAttachment[]    @relation("TaskAttachmentUploader")
+  taskHistoryEntries TaskHistory[]       @relation("TaskHistoryUser")
+  taskTimeLogs       TaskTimeLog[]       @relation("TaskTimeLogUser")
+  taskNotifications  TaskNotification[]  @relation("TaskNotifUser")
 }
 
 model Project {
@@ -44,6 +51,7 @@ model Project {
   rtms            RTM[]
   bugPredictions  BugPrediction[]
   defects         Defect[]
+  dailyTasks      DailyTask[]
 }
 
 model ProjectMember {
@@ -158,6 +166,119 @@ model BugPrediction {
   createdAt       DateTime @default(now())
 }
 
+model DailyTask {
+  id             String          @id @default(cuid())
+  taskId         String          @unique
+  title          String
+  description    String          @default("")
+  projectId      String?
+  project        Project?        @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  sprint         String          @default("")
+  epic           String          @default("")
+  userStory      String          @default("")
+  module         String          @default("")
+  feature        String          @default("")
+  taskCategory   String          @default("MANUAL_TESTING")
+  taskType       String          @default("FUNCTIONAL")
+  priority       String          @default("MEDIUM")
+  severity       String          @default("MODERATE")
+  status         String          @default("TO_DO")
+  assignedById   String?
+  assignedBy     User?           @relation("TaskAssigner", fields: [assignedById], references: [id], onDelete: SetNull)
+  assignedToId   String?
+  assignedTo     User?           @relation("TaskAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  estimatedHours Float           @default(0)
+  actualHours    Float           @default(0)
+  storyPoints    Int             @default(0)
+  startDate      DateTime?
+  dueDate        DateTime?
+  completionDate DateTime?
+  environment    String          @default("")
+  dependencies   String          @default("")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  comments       TaskComment[]
+  attachments    TaskAttachment[]
+  history        TaskHistory[]
+  timeLogs       TaskTimeLog[]
+  labels         TaskLabel[]
+}
+
+model TaskComment {
+  id        String       @id @default(cuid())
+  taskId    String
+  task      DailyTask    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User         @relation("TaskCommenter", fields: [userId], references: [id], onDelete: Cascade)
+  comment   String
+  parentId  String?
+  parent    TaskComment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   TaskComment[] @relation("CommentReplies")
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+model TaskAttachment {
+  id           String     @id @default(cuid())
+  taskId       String
+  task         DailyTask  @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  fileName     String
+  fileType     String
+  filePath     String
+  fileSize     Int         @default(0)
+  uploadedById String
+  uploadedBy   User       @relation("TaskAttachmentUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+}
+
+model TaskHistory {
+  id        String     @id @default(cuid())
+  taskId    String
+  task      DailyTask  @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User       @relation("TaskHistoryUser", fields: [userId], references: [id], onDelete: Cascade)
+  action    String
+  field     String     @default("")
+  oldValue  String     @default("")
+  newValue  String     @default("")
+  details   String     @default("")
+  createdAt DateTime   @default(now())
+}
+
+model TaskTimeLog {
+  id          String     @id @default(cuid())
+  taskId      String
+  task        DailyTask  @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User       @relation("TaskTimeLogUser", fields: [userId], references: [id], onDelete: Cascade)
+  startTime   DateTime
+  endTime     DateTime?
+  duration    Float      @default(0)
+  description String     @default("")
+  date        String
+  createdAt   DateTime   @default(now())
+}
+
+model TaskLabel {
+  id     String     @id @default(cuid())
+  taskId String
+  task   DailyTask  @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  name   String
+  color  String     @default("#10b981")
+}
+
+model TaskNotification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation("TaskNotifUser", fields: [userId], references: [id], onDelete: Cascade)
+  taskId    String?
+  title     String
+  message   String
+  type      String   @default("INFO")
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
 model AuditLog {
   id         String   @id @default(cuid())
   userId     String?
@@ -178,33 +299,33 @@ model AppSetting {
 }
 
 model Defect {
-  id                String          @id @default(cuid())
-  defectId          String          @default("")
-  title             String
-  description       String          @default("")
-  module            String          @default("")
-  severity          String          @default("MEDIUM")
-  priority          String          @default("MEDIUM")
-  status            String          @default("NEW")
-  environment       String          @default("")
-  buildVersion      String          @default("")
-  stepsToReproduce  String          @default("")
-  expectedResult    String          @default("")
-  actualResult      String          @default("")
-  attachment        String          @default("")
-  projectId         String
-  project           Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  testCaseId        String          @default("")
-  reportedById      String
-  reportedBy        User            @relation("DefectReporter", fields: [reportedById], references: [id])
-  assignedToId      String?
-  assignedTo        User?           @relation("DefectAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
-  resolution        String          @default("")
-  resolvedAt        DateTime?
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  comments          DefectComment[]
-  history           DefectHistory[]
+  id               String          @id @default(cuid())
+  defectId         String          @default("")
+  title            String
+  description      String          @default("")
+  module           String          @default("")
+  severity         String          @default("MEDIUM")
+  priority         String          @default("MEDIUM")
+  status           String          @default("NEW")
+  environment      String          @default("")
+  buildVersion     String          @default("")
+  stepsToReproduce String          @default("")
+  expectedResult   String          @default("")
+  actualResult     String          @default("")
+  attachment       String          @default("")
+  projectId        String
+  project          Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  testCaseId       String          @default("")
+  reportedById     String
+  reportedBy       User            @relation("DefectReporter", fields: [reportedById], references: [id])
+  assignedToId     String?
+  assignedTo       User?           @relation("DefectAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  resolution       String          @default("")
+  resolvedAt       DateTime?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  comments         DefectComment[]
+  history          DefectHistory[]
 }
 
 model DefectComment {
@@ -218,15 +339,15 @@ model DefectComment {
 }
 
 model DefectHistory {
-  id          String   @id @default(cuid())
-  defectId    String
-  defect      Defect   @relation(fields: [defectId], references: [id], onDelete: Cascade)
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  action      String
-  field       String   @default("")
-  oldValue    String   @default("")
-  newValue    String   @default("")
-  details     String   @default("")
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  defectId  String
+  defect    Defect   @relation(fields: [defectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String
+  field     String   @default("")
+  oldValue  String   @default("")
+  newValue  String   @default("")
+  details   String   @default("")
+  createdAt DateTime @default(now())
 }

@@ -522,6 +522,27 @@ export const dashboardChartData: DashboardChartData = {
     { month: "May", testCases: 104, defects: 16 },
     { month: "Jun", testCases: 87, defects: 10 },
   ],
+  testCasesOverTime: [
+    { date: "Week 1", created: 12, approved: 8 },
+    { date: "Week 2", created: 18, approved: 14 },
+    { date: "Week 3", created: 15, approved: 11 },
+    { date: "Week 4", created: 22, approved: 19 },
+    { date: "Week 5", created: 28, approved: 21 },
+    { date: "Week 6", created: 20, approved: 16 },
+  ],
+  testCaseDistribution: [
+    { name: "Functional", value: 45, fill: "#10b981" },
+    { name: "Security", value: 18, fill: "#f59e0b" },
+    { name: "Performance", value: 12, fill: "#8b5cf6" },
+    { name: "Regression", value: 25, fill: "#3b82f6" },
+    { name: "Smoke", value: 8, fill: "#ef4444" },
+  ],
+  coverageByProject: [
+    { project: "E-Commerce", covered: 78, total: 92 },
+    { project: "Banking App", covered: 45, total: 68 },
+    { project: "CRM System", covered: 32, total: 40 },
+    { project: "Healthcare", covered: 56, total: 85 },
+  ],
 };
 
 // ─── Generation Results ─────────────────────────────────────────────────────
